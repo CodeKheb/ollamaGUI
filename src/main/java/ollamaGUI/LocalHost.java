@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,30 +17,31 @@ public class LocalHost {
 
 
     public static void OllamaParsedJson(String prompt, javafx.scene.control.TextArea textArea) throws IOException, InterruptedException {
-        String json = String.format("""
-                {
-                "model": "qwen2.5-coder:0.5b",
-                "prompt": "%s",
-                "stream": true
-                }
-                """, prompt);
+        // Jackson Parser for inputting prompts to send to Ollama
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(Map.of(
+                "model", "qwen2.5-coder:0.5b",
+                "prompt", prompt,
+                "stream", true
+        ));
 
 
         HttpClient client = HttpClient.newHttpClient();
 
 
+        // API request
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:11434/api/generate"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
 
-
+        // InputStream for Streaming text
         HttpResponse<InputStream> response =
                 client.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
-        ObjectMapper mapper = new ObjectMapper();
 
+        // Read the Ollama response
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(response.body()))) {
             String line;
 
@@ -61,6 +63,9 @@ public class LocalHost {
 
     }
 
+
+
+    // Another JSON parser for the response of ollama
     static String extractText(String line) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(line);
