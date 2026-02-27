@@ -61,6 +61,8 @@ import java.net.http.HttpResponse;
 HTTP Request
 ``` java
         HttpClient client = HttpClient.newHttpClient();
+        // Default Ollama localhost:11434
+        // DO NOT WORRY ABOUT THIS LEAKING, IT'S ONLY LOCALLY HOSTED
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:11434/api/generate"))
                 .header("Content-Type", "application/json")
