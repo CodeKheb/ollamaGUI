@@ -17,10 +17,11 @@ public class LocalHost {
 
 
     public static void OllamaParsedJson(String prompt, javafx.scene.control.TextArea textArea) throws IOException, InterruptedException {
+        String model = Main.modelSelector.getValue();
         // Jackson Parser for inputting prompts to send to Ollama
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(Map.of(
-                "model", "qwen2.5-coder:0.5b",
+                "model", model,
                 "prompt", prompt,
                 "stream", true
         ));

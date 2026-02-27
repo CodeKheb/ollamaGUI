@@ -2,14 +2,15 @@ package ollamaGUI;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -19,12 +20,29 @@ import java.util.Objects;
 
 public class Main extends Application {
 
+    public static ComboBox<String> modelSelector;
+
     private TextArea responseArea;
     private TextField userInput;
 
 
     @Override
     public void start(Stage stage) {
+
+        /* ComboBox<String> modelSelector add models in a ComboBox
+        set the default value to qwen2.5-coder:0.5b
+        the static ComboBox will then get called in LocalHost and change the model value
+         */
+        modelSelector = new ComboBox<>();
+        modelSelector.getItems().addAll(
+                "qwen2.5-coder:0.5b",
+                "phi",
+                "MeetSolanki/MeetAISmall",
+                "dolphin-mistral",
+                "llama3"
+        );
+        modelSelector.setValue("qwen2.5-coder:0.5b");
+
 
         responseArea = new TextArea();
         responseArea.setEditable(false);
@@ -76,7 +94,25 @@ public class Main extends Application {
         });
 
 
-        VBox root = new VBox(10, responseArea, userInput, sendPrompt, chooseFile);
+        GridPane grid = new GridPane();
+        GridPane.setHalignment(chooseFile, HPos.RIGHT);
+
+        grid.add(sendPrompt, 0, 2);
+        grid.add(chooseFile, 2, 2);
+        grid.add(modelSelector, 1, 2);
+
+        ColumnConstraints column0 = new ColumnConstraints();
+        column0.setPercentWidth(10);
+        ColumnConstraints column1 = new ColumnConstraints();
+        column1.setHalignment(HPos.LEFT);
+        column1.setPercentWidth(40);
+        ColumnConstraints column2 = new ColumnConstraints();
+        column2.setPercentWidth(50);
+        grid.getColumnConstraints().addAll(column0, column1, column2);
+
+
+
+        VBox root = new VBox(10, responseArea, userInput, grid);
 
 
         VBox.setVgrow(responseArea, Priority.ALWAYS);
@@ -113,6 +149,7 @@ public class Main extends Application {
         }
     }
 
+    // readFile to readFile from FileChooser chooseFile
     private void readFile(File file) {
         new Thread(() ->
         {
@@ -125,10 +162,9 @@ public class Main extends Application {
                 Platform.runLater(() ->
                 {
                     responseArea.clear();
-                    responseArea.appendText("Reading file: " + file.getName());
+                    responseArea.appendText("Reading file: " + file.getName() + "\n");
                 });
 
-                System.out.println();
                 LocalHost.OllamaParsedJson(prompt, responseArea);
             } catch (Exception err) {
                 err.printStackTrace();
