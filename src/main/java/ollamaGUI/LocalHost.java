@@ -1,9 +1,6 @@
 package ollamaGUI;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -12,11 +9,15 @@ import java.net.http.HttpResponse;
 import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.application.Platform;
 
 public class LocalHost {
 
+    public static void OllamaParsedJson(String prompt,
+                                        javafx.scene.control.TextArea textArea,
+                                        Runnable done)
+            throws IOException, InterruptedException {
 
-    public static void OllamaParsedJson(String prompt, javafx.scene.control.TextArea textArea) throws IOException, InterruptedException {
         String model = Main.modelSelector.getValue();
         // Jackson Parser for inputting prompts to send to Ollama
         ObjectMapper mapper = new ObjectMapper();
@@ -26,9 +27,7 @@ public class LocalHost {
                 "stream", true
         ));
 
-
         HttpClient client = HttpClient.newHttpClient();
-
 
         // API request
         HttpRequest request = HttpRequest.newBuilder()
@@ -47,6 +46,9 @@ public class LocalHost {
             String line;
 
             while ((line = reader.readLine()) != null) {
+                // for debugging JsonNode + ObjectMapper reader
+                // System.out.println(line);
+                JsonNode node = mapper.readTree(line);
                 if (line.isBlank()) continue;
 
 
@@ -56,21 +58,23 @@ public class LocalHost {
                     javafx.application.Platform.runLater(() ->
                             textArea.appendText(extractedText));
                 }
+
+                // loadingOverlay set visible = false, after the first token
+                if (!node.isEmpty())
+                {
+                    Platform.runLater(done);
+                }
             }
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
-
-
 
     // Another JSON parser for the response of ollama
     static String extractText(String line) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(line);
-
 
         if (node.has("response")) {
             return node.get("response").asText();

@@ -3,6 +3,19 @@
     -fx-opacity: 0.95;
 }
 
+.loadingOverlay {
+    -fx-background-color: rgba(0, 0, 0, 0.1);
+}
+.loaderOverlay.progress-indicator {
+    -fx-progress-color: #ea72ab;
+}
+.loadingOverlay Label {
+    -fx-text-fill: #15173D;
+    -fx-font-size: 16;
+    -fx-font-weight: bold;
+    -fx-padding: 10;
+}
+
 .button {
     -fx-background-color: #F1E9E9;
     -fx-text-fill: #15173D;

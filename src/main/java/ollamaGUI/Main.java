@@ -4,11 +4,9 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
@@ -21,6 +19,8 @@ import java.util.Objects;
 public class Main extends Application {
 
     public static ComboBox<String> modelSelector;
+    public static final VBox loadingOverlay = new VBox(20);
+    public static Label loadingMessage = new Label();
 
     private TextArea responseArea;
     private TextField userInput;
@@ -31,7 +31,8 @@ public class Main extends Application {
 
         /* ComboBox<String> modelSelector add models in a ComboBox
         set the default value to qwen2.5-coder:0.5b
-        the static ComboBox will then get called in LocalHost and change the model value
+        the static ComboBox will then get called in LocalHost
+        and then it changes the String "model" value
          */
         modelSelector = new ComboBox<>();
         modelSelector.getItems().addAll(
@@ -89,11 +90,17 @@ public class Main extends Application {
             if (file != null) {
                 readFile(file);
             } else {
-                System.out.println("ERRORRROROROROR");
+                System.out.println("ERROR");
             }
         });
 
 
+        /* GridPane grid
+        Adds the button sendPrompt and chooseFile + modelSelector in the same row
+        but different columns
+        ColumnConstraints setPercentWidth to determine their relative position from each other
+        setHalignment for column1 modelSelector HPos.LEFT so it is close to column0 sendPrompt
+        */
         GridPane grid = new GridPane();
         GridPane.setHalignment(chooseFile, HPos.RIGHT);
 
@@ -112,18 +119,39 @@ public class Main extends Application {
 
 
 
+        /* VBox root for Vertical Layout add responseArea, userInput and grid
+        setVgrow for responseArea to be always Prioritized
+        set Insets (to inside from outside) padding to 10
+        */
         VBox root = new VBox(10, responseArea, userInput, grid);
-
-
         VBox.setVgrow(responseArea, Priority.ALWAYS);
         root.setPadding(new Insets(10));
-        Scene mainScene = new Scene(root, 800, 600);
 
-        // CSS getter in /resources/style.css requires it to be non null
+
+        /* loadingOverlay and loadingMessage initialized as static
+        setAlignment to Center
+        add a ProgressIndicator loading
+        add children loading and loadingMessage
+        setVisible false : will be set true when sendFile and getMessage and readFile is in action
+        */
+        loadingOverlay.setAlignment(Pos.CENTER);
+        ProgressIndicator loading = new ProgressIndicator();
+        loadingOverlay.getChildren().addAll(loading, loadingMessage);
+        loadingOverlay.setVisible(false);
+
+
+        // stackPane to add the root and loadingOverlay, initialized in the Scene mainScene
+        StackPane stackPane = new StackPane();
+        stackPane.getChildren().addAll(root, loadingOverlay);
+        Scene mainScene = new Scene(stackPane, 800, 600);
+
+        // CSS getter in /resources/style.css
+        loadingOverlay.getStyleClass().add("loadingOverlay");
         mainScene.getStylesheets().add(
                 Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm()
         );
 
+        // show the Scene mainScene
         stage.setScene(mainScene);
         stage.setTitle("Ollama GUI using javaFX");
         stage.show();
@@ -135,13 +163,21 @@ public class Main extends Application {
         if (!prompt.isBlank())
         {
             userInput.clear();
+            loadingOverlay.setVisible(false);
+
             new Thread(() ->
             {
                 try {
-                    responseArea.clear();
-                    LocalHost.OllamaParsedJson(prompt, responseArea);
+                    Platform.runLater(() ->
+                    {
+                        responseArea.clear();
+                        loadingMessage.setText(modelSelector.getValue() + " is thinking...");
+                        loadingOverlay.setVisible(true);
+                    });
+                    LocalHost.OllamaParsedJson(prompt, responseArea,
+                            () -> Platform.runLater(() ->
+                                    loadingOverlay.setVisible(false)));
                 } catch (Exception err) {
-                    err.printStackTrace();
                     Platform.runLater(() ->
                             responseArea.appendText(err.getMessage()));
                 }
@@ -156,18 +192,19 @@ public class Main extends Application {
             try {
                 String prompt = Files.readString(file.toPath());
                 System.out.println(prompt);
-                System.out.println(prompt.length());
-
+                loadingOverlay.setVisible(false);
 
                 Platform.runLater(() ->
                 {
                     responseArea.clear();
-                    responseArea.appendText("Reading file: " + file.getName() + "\n");
+                    loadingMessage.setText(modelSelector.getValue() + " is thinking...");
+                    loadingOverlay.setVisible(true);
                 });
 
-                LocalHost.OllamaParsedJson(prompt, responseArea);
+                LocalHost.OllamaParsedJson(prompt, responseArea,
+                        () -> Platform.runLater(() ->
+                                loadingOverlay.setVisible(false)));
             } catch (Exception err) {
-                err.printStackTrace();
                 Platform.runLater(() ->
                         responseArea.appendText(err.getMessage()));
             }
