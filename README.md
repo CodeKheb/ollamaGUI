@@ -148,7 +148,13 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.Objects;
 ```
+### Current Features
+- CSS Styling
+- Grid 
+- Buttons
+- Action "Enter" Key + Click to Send Prompt
  > To be continued, still experimenting with the UI/UX
+
 
 
 To do list:

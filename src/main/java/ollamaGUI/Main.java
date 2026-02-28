@@ -16,6 +16,8 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.Objects;
 
+import static java.lang.Double.MAX_VALUE;
+
 public class Main extends Application {
 
     public static ComboBox<String> modelSelector;
@@ -31,7 +33,7 @@ public class Main extends Application {
 
         /* ComboBox<String> modelSelector add models in a ComboBox
         set the default value to qwen2.5-coder:0.5b
-        the static ComboBox will then get called in LocalHost
+        the static ComboBox will then get called in LocalHost,
         and then it changes the String "model" value
          */
         modelSelector = new ComboBox<>();
@@ -48,8 +50,8 @@ public class Main extends Application {
         responseArea = new TextArea();
         responseArea.setEditable(false);
         responseArea.setWrapText(true);
-        responseArea.setMaxWidth(Double.MAX_VALUE);
-        responseArea.setMaxHeight(Double.MAX_VALUE);
+        responseArea.setMaxWidth(MAX_VALUE);
+        responseArea.setMaxHeight(MAX_VALUE);
 
         userInput = new TextField();
         userInput.setPromptText("What's on your mind today?");
