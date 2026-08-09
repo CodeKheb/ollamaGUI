@@ -1,4 +1,4 @@
-package ollamaGUI;
+package ollamaGUI.Server;
 
 import java.io.*;
 import java.net.URI;
@@ -11,21 +11,24 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 
+import ollamaGUI.GUI.ModelSelector;
+
 public class LocalHost {
 
+    private static ModelSelector modelSelector = new ModelSelector();
+
     public static void OllamaParsedJson(String prompt,
-                                        javafx.scene.control.TextArea textArea,
-                                        Runnable done)
+            javafx.scene.control.TextArea textArea,
+            Runnable done)
             throws IOException, InterruptedException {
 
-        String model = Main.modelSelector.getValue();
+        String model = modelSelector.getValue();
         // Jackson Parser for inputting prompts to send to Ollama
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(Map.of(
                 "model", model,
                 "prompt", prompt,
-                "stream", true
-        ));
+                "stream", true));
 
         HttpClient client = HttpClient.newHttpClient();
 
@@ -37,9 +40,7 @@ public class LocalHost {
                 .build();
 
         // InputStream for Streaming text
-        HttpResponse<InputStream> response =
-                client.send(request, HttpResponse.BodyHandlers.ofInputStream());
-
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
         // Read the Ollama response
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(response.body()))) {
@@ -49,19 +50,16 @@ public class LocalHost {
                 // for debugging JsonNode + ObjectMapper reader
                 // System.out.println(line);
                 JsonNode node = mapper.readTree(line);
-                if (line.isBlank()) continue;
-
+                if (line.isBlank())
+                    continue;
 
                 String extractedText = extractText(line);
-                if (!extractedText.isEmpty())
-                {
-                    javafx.application.Platform.runLater(() ->
-                            textArea.appendText(extractedText));
+                if (!extractedText.isEmpty()) {
+                    javafx.application.Platform.runLater(() -> textArea.appendText(extractedText));
                 }
 
                 // loadingOverlay set visible = false, after the first token
-                if (!node.isEmpty())
-                {
+                if (!node.isEmpty()) {
                     Platform.runLater(done);
                 }
             }
@@ -77,8 +75,11 @@ public class LocalHost {
         JsonNode node = mapper.readTree(line);
 
         if (node.has("response")) {
+            // System.out.println("Response " + response);
             return node.get("response").asText();
         } else {
+            // System.out.println("NO RESPONSE");
+            // System.out.println(modelSelector.getValue());
             return "";
         }
     }

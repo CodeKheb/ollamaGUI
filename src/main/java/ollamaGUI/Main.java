@@ -18,9 +18,12 @@ import java.util.Objects;
 
 import static java.lang.Double.MAX_VALUE;
 
+import ollamaGUI.GUI.ModelSelector;
+import ollamaGUI.Server.LocalHost;
+
 public class Main extends Application {
 
-    public static ComboBox<String> modelSelector;
+    ModelSelector modelSelector = new ModelSelector();
     public static final VBox loadingOverlay = new VBox(20);
     public static Label loadingMessage = new Label();
 
@@ -30,21 +33,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-
-        /* ComboBox<String> modelSelector add models in a ComboBox
-        set the default value to qwen2.5-coder:0.5b
-        the static ComboBox will then get called in LocalHost,
-        and then it changes the String "model" value
-         */
-        modelSelector = new ComboBox<>();
-        modelSelector.getItems().addAll(
-                "qwen2.5-coder:0.5b",
-                "phi",
-                "MeetSolanki/MeetAISmall",
-                "dolphin-mistral",
-                "llama3"
-        );
-        modelSelector.setValue("qwen2.5-coder:0.5b");
 
 
         responseArea = new TextArea();
@@ -108,7 +96,7 @@ public class Main extends Application {
 
         grid.add(sendPrompt, 0, 2);
         grid.add(chooseFile, 2, 2);
-        grid.add(modelSelector, 1, 2);
+        grid.add(modelSelector.SelectModel(), 1, 2);
 
         ColumnConstraints column0 = new ColumnConstraints();
         column0.setPercentWidth(10);
@@ -174,11 +162,13 @@ public class Main extends Application {
                     {
                         responseArea.clear();
                         loadingMessage.setText(modelSelector.getValue() + " is thinking...");
+                        System.out.println("Message Sent");
                         loadingOverlay.setVisible(true);
                     });
                     LocalHost.OllamaParsedJson(prompt, responseArea,
                             () -> Platform.runLater(() ->
                                     loadingOverlay.setVisible(false)));
+                        System.out.println("Got Message");
                 } catch (Exception err) {
                     Platform.runLater(() ->
                             responseArea.appendText(err.getMessage()));
