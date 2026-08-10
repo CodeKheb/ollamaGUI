@@ -4,20 +4,18 @@ import javafx.scene.control.TextField;
 
 public class UserInput {
     
-    private TextField userInput = new TextField();
+    private static TextField userInput = new TextField();
 
-    public TextField InputBox() {
+    public static TextField get() {
         userInput.setPromptText("What's on your mind today?");
-
         return userInput;
     }
 
-
-    public String getText() {
+    public static String getText() {
         return userInput.getText();
     }
 
-    public void clear() {
+    public static void clear() {
         userInput.clear();
     }
 }

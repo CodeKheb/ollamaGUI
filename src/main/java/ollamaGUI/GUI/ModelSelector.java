@@ -6,10 +6,6 @@ public class ModelSelector {
 
     private static ComboBox<String> selector;
 
-    public ModelSelector() {
-
-    }
-
     public ComboBox<String> SelectModel(){
         /* ComboBox<String> modelSelector add models in a ComboBox
         set the default value to qwen2.5-coder:0.5b
