@@ -19,16 +19,17 @@ import java.util.Objects;
 import static java.lang.Double.MAX_VALUE;
 
 import ollamaGUI.GUI.ModelSelector;
+import ollamaGUI.GUI.UserInput;
 import ollamaGUI.Server.LocalHost;
 
 public class Main extends Application {
 
     ModelSelector modelSelector = new ModelSelector();
+    UserInput userInput = new UserInput();
     public static final VBox loadingOverlay = new VBox(20);
     public static Label loadingMessage = new Label();
 
     private TextArea responseArea;
-    private TextField userInput;
 
 
     @Override
@@ -40,9 +41,6 @@ public class Main extends Application {
         responseArea.setWrapText(true);
         responseArea.setMaxWidth(MAX_VALUE);
         responseArea.setMaxHeight(MAX_VALUE);
-
-        userInput = new TextField();
-        userInput.setPromptText("What's on your mind today?");
 
 
         Button sendPrompt = new Button("Send");
@@ -113,7 +111,7 @@ public class Main extends Application {
         setVgrow for responseArea to be always Prioritized
         set Insets (to inside from outside) padding to 10
         */
-        VBox root = new VBox(10, responseArea, userInput, grid);
+        VBox root = new VBox(10, responseArea, userInput.InputBox(), grid);
         VBox.setVgrow(responseArea, Priority.ALWAYS);
         root.setPadding(new Insets(10));
 
