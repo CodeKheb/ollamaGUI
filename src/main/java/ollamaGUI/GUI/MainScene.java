@@ -62,9 +62,4 @@ public class MainScene {
 
         return mainScene;
     }
-
-    public static void setStage(Stage stage) {
-        ChooseFile.setStage(stage);
-
-    }
 }

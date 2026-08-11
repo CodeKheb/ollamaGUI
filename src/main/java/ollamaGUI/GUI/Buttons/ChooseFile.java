@@ -11,7 +11,6 @@ public class ChooseFile {
 
     private static Button chooseFile = new Button("Choose File");
     private static FileChooser fileChooser = new FileChooser();
-    private static File file;
     private static Stage stage = new Stage();
 
     public Button get() {
@@ -26,7 +25,7 @@ public class ChooseFile {
         chooseFile.setOnAction(choose -> {
             fileChooser.setTitle("Select A File");
 
-            fileChooser.showOpenDialog(stage);
+            File file = fileChooser.showOpenDialog(stage);
             if (file != null) {
                 FileManager.read(file);
             } else {
