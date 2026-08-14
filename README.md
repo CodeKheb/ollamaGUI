@@ -6,7 +6,7 @@ A desktop chat interface for interacting with locally-hosted AI models (Ollama),
 
 ## Stack
 
-- Java 21
+- Java 25
 - JavaFX 25
 - Maven
 - Jackson (JSON)
@@ -14,7 +14,7 @@ A desktop chat interface for interacting with locally-hosted AI models (Ollama),
 
 ## Prerequisites
 
-- JDK 21+
+- JDK 25
 - Maven
 - [Ollama](https://ollama.com) installed and running locally (defaults to `http://localhost:11434`)
 
@@ -39,8 +39,8 @@ mvn clean javafx:run
 
 ## Project Layout
 
-- `GUI` — JavaFX user interface
-- `Read` — reading prompts and messages
-- `Server` — communication with the local Ollama API
+- `view` — JavaFX user interface (scenes, components, buttons)
+- `controller` — wiring between the view and the services
+- `service` — communication with the local Ollama API
 
-> Note: The layout is likely to change as the architecture settles.
+> Note: The layout is still settling and may change.
