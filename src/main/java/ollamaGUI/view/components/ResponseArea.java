@@ -1,25 +1,29 @@
-package ollamaGUI.GUI;
+package ollamaGUI.view.components;
 
 import static java.lang.Double.MAX_VALUE;
+
 import javafx.scene.control.TextArea;
 
 public class ResponseArea {
 
-    private static TextArea responseArea = new TextArea();
+    private final TextArea responseArea = new TextArea();
 
-    public static TextArea get() {
+    public ResponseArea() {
         responseArea.setEditable(false);
         responseArea.setWrapText(true);
         responseArea.setMaxWidth(MAX_VALUE);
         responseArea.setMaxHeight(MAX_VALUE);
+    }
+
+    public TextArea getNode() {
         return responseArea;
     }
 
-    public static void clear(){
+    public void clear() {
         responseArea.clear();
     }
 
-    public static void setResponse(String response) {
-        responseArea.appendText(response);
+    public void append(String text) {
+        responseArea.appendText(text);
     }
 }

@@ -1,21 +1,24 @@
-package ollamaGUI.GUI;
+package ollamaGUI.view.components;
 
 import javafx.scene.control.TextField;
 
 public class UserInput {
-    
-    private static TextField userInput = new TextField();
 
-    public static TextField get() {
+    private final TextField userInput = new TextField();
+
+    public UserInput() {
         userInput.setPromptText("What's on your mind today?");
+    }
+
+    public TextField getNode() {
         return userInput;
     }
 
-    public static String getText() {
+    public String getText() {
         return userInput.getText();
     }
 
-    public static void clear() {
+    public void clear() {
         userInput.clear();
     }
 }
